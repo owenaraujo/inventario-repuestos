@@ -5,6 +5,7 @@ import {
   createRepuesto,
   updateRepuesto,
   deleteRepuesto,
+  reactivarRepuesto,
   getRepuestosBajoStock
 } from '../controllers/repuestosController.js'
 import { authMiddleware } from '../middleware/auth.js'
@@ -18,5 +19,6 @@ router.get('/:id', getRepuestoById)
 router.post('/', createRepuesto)
 router.put('/:id', updateRepuesto)
 router.delete('/:id', deleteRepuesto)
+router.put('/:id/reactivar', reactivarRepuesto)
 
 export default router

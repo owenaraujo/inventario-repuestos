@@ -1,19 +1,25 @@
 import { getSupabaseWithToken } from '../supabase.js'
 
+// Obtener todos los proveedores activos
 export const getProveedores = async (req, res) => {
   try {
+    
     const supabase = getSupabaseWithToken(req.token)
     const { data, error } = await supabase
       .from('proveedores')
       .select('*')
+      .eq('activo', true)
       .order('nombre')
     if (error) throw error
+    
     res.json(data)
   } catch (error) {
+    
     res.status(500).json({ error: error.message })
   }
 }
 
+// Obtener un proveedor por ID (sin filtrar activo, para mostrar detalles aunque esté inactivo)
 export const getProveedorById = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
@@ -31,6 +37,7 @@ export const getProveedorById = async (req, res) => {
   }
 }
 
+// Crear un nuevo proveedor (activo por defecto)
 export const createProveedor = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
@@ -39,7 +46,7 @@ export const createProveedor = async (req, res) => {
 
     const { data, error } = await supabase
       .from('proveedores')
-      .insert([{ nombre, telefono, email, direccion }])
+      .insert([{ nombre, telefono, email, direccion, activo: true }])
       .select()
       .single()
     if (error) throw error
@@ -49,11 +56,15 @@ export const createProveedor = async (req, res) => {
   }
 }
 
+// Actualizar un proveedor (no permite modificar 'activo')
 export const updateProveedor = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
     const { id } = req.params
-    const updates = req.body
+    const updates = { ...req.body }
+    delete updates.activo  // evitar que se modifique el estado directamente
+    delete updates.id
+
     const { data, error } = await supabase
       .from('proveedores')
       .update(updates)
@@ -68,16 +79,33 @@ export const updateProveedor = async (req, res) => {
   }
 }
 
+// Soft delete: marcar como inactivo
 export const deleteProveedor = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
     const { id } = req.params
     const { error } = await supabase
       .from('proveedores')
-      .delete()
+      .update({ activo: false })
       .eq('id', id)
     if (error) throw error
-    res.json({ message: 'Proveedor eliminado correctamente' })
+    res.json({ message: 'Proveedor desactivado correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+// Reactivar proveedor (opcional)
+export const reactivarProveedor = async (req, res) => {
+  try {
+    const supabase = getSupabaseWithToken(req.token)
+    const { id } = req.params
+    const { error } = await supabase
+      .from('proveedores')
+      .update({ activo: true })
+      .eq('id', id)
+    if (error) throw error
+    res.json({ message: 'Proveedor reactivado' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

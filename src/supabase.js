@@ -10,6 +10,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Cliente autenticado con token JWT del usuario
 export const getSupabaseWithToken = (token) => {
+  
   return createClient(supabaseUrl, supabaseAnonKey, {
     global: {
       headers: {

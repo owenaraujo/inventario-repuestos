@@ -4,7 +4,8 @@ import {
   getProveedorById,
   createProveedor,
   updateProveedor,
-  deleteProveedor
+  deleteProveedor,
+  reactivarProveedor
 } from '../controllers/proveedoresController.js'
 import { authMiddleware } from '../middleware/auth.js'
 
@@ -16,5 +17,6 @@ router.get('/:id', getProveedorById)
 router.post('/', createProveedor)
 router.put('/:id', updateProveedor)
 router.delete('/:id', deleteProveedor)
+router.put('/:id/reactivar', reactivarProveedor)
 
 export default router

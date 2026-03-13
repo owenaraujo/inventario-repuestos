@@ -13,6 +13,6 @@ router.use(authMiddleware)
 router.get('/', getMovimientos)
 router.get('/:id', getMovimientoById)
 router.post('/', createMovimiento)
-router.delete('/:id', deleteMovimiento)
+router.delete('/:id', deleteMovimiento) // opcional
 
 export default router

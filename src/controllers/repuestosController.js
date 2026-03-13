@@ -1,5 +1,6 @@
 import { getSupabaseWithToken } from '../supabase.js'
 
+// Obtener repuestos activos con sus relaciones (categorías y proveedores, aunque estén inactivos)
 export const getRepuestos = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
@@ -10,10 +11,13 @@ export const getRepuestos = async (req, res) => {
         categorias (*),
         proveedores (*)
       `)
+      .eq('activo', true)
       .order('nombre')
     if (error) throw error
     res.json(data)
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json({ error: error.message })
   }
 }
@@ -57,7 +61,8 @@ export const createRepuesto = async (req, res) => {
         precio_compra,
         precio_venta,
         ubicacion,
-        imagen_url
+        imagen_url,
+        activo: true
       }])
       .select()
       .single()
@@ -70,11 +75,14 @@ export const createRepuesto = async (req, res) => {
 
 export const updateRepuesto = async (req, res) => {
   try {
-    console.log(req.body[1]);
-    
     const supabase = getSupabaseWithToken(req.token)
     const { id } = req.params
-    const updates = req.body
+    const updates = { ...req.body }
+    delete updates.activo
+    delete updates.id
+    delete updates.categorias
+    delete updates.proveedores
+
     const { data, error } = await supabase
       .from('repuestos')
       .update(updates)
@@ -85,8 +93,6 @@ export const updateRepuesto = async (req, res) => {
     if (!data) return res.status(404).json({ error: 'Repuesto no encontrado' })
     res.json(data)
   } catch (error) {
-    console.log(error);
-    
     res.status(500).json({ error: error.message })
   }
 }
@@ -97,15 +103,31 @@ export const deleteRepuesto = async (req, res) => {
     const { id } = req.params
     const { error } = await supabase
       .from('repuestos')
-      .delete()
+      .update({ activo: false })
       .eq('id', id)
     if (error) throw error
-    res.json({ message: 'Repuesto eliminado correctamente' })
+    res.json({ message: 'Repuesto desactivado correctamente' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
 }
 
+export const reactivarRepuesto = async (req, res) => {
+  try {
+    const supabase = getSupabaseWithToken(req.token)
+    const { id } = req.params
+    const { error } = await supabase
+      .from('repuestos')
+      .update({ activo: true })
+      .eq('id', id)
+    if (error) throw error
+    res.json({ message: 'Repuesto reactivado' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+// Función RPC para stock bajo (solo repuestos activos)
 export const getRepuestosBajoStock = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)

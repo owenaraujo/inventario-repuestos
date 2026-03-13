@@ -53,7 +53,7 @@ export const createMovimiento = async (req, res) => {
       return res.status(400).json({ error: 'La cantidad debe ser mayor a cero' })
     }
 
-    // Verificar stock suficiente si es salida
+    // Verificar stock si es salida
     if (tipo === 'salida') {
       const { data: repuesto, error: repError } = await supabase
         .from('repuestos')
@@ -81,8 +81,9 @@ export const createMovimiento = async (req, res) => {
       .single()
     if (error) throw error
 
-    // Si no tienes trigger en la BD, puedes actualizar stock manualmente aquí
-    // ...
+    // Si no hay trigger en BD, actualizar stock manualmente:
+    // (Aquí podrías hacer una segunda llamada a Supabase para actualizar el stock)
+    // Pero se asume que el trigger ya existe (de implementaciones anteriores)
 
     res.status(201).json(data)
   } catch (error) {
@@ -90,6 +91,7 @@ export const createMovimiento = async (req, res) => {
   }
 }
 
+// Opcional: eliminar movimiento (rara vez necesario, pero se puede mantener)
 export const deleteMovimiento = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
