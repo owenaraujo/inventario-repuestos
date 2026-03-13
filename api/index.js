@@ -14,6 +14,9 @@ const PORT = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
+app.use(cors({
+  exposedHeaders: ['X-Total-Count']
+}));
 
 app.use('/api/repuestos', repuestosRoutes)
 app.use('/api/categorias', categoriasRoutes)
@@ -23,6 +26,7 @@ app.use('/api/movimientos', movimientosRoutes)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'API funcionando correctamente' })
 })
+
 
 // Ruta comodín para 404
 app.use('/', (req, res) => {

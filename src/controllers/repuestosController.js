@@ -1,27 +1,46 @@
 import { getSupabaseWithToken } from '../supabase.js'
 
-// Obtener repuestos activos con sus relaciones (categorías y proveedores, aunque estén inactivos)
+
+// Obtener repuestos con paginación y búsqueda
 export const getRepuestos = async (req, res) => {
   try {
-    const supabase = getSupabaseWithToken(req.token)
-    const { data, error } = await supabase
+    const supabase = getSupabaseWithToken(req.token);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
+
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    let query = supabase
       .from('repuestos')
       .select(`
         *,
         categorias (*),
         proveedores (*)
-      `)
-      .eq('activo', true)
-      .order('nombre')
-    if (error) throw error
-    res.json(data)
-  } catch (error) {
-    console.log(error);
-    
-    res.status(500).json({ error: error.message })
-  }
-}
+      `, { count: 'exact' })
+      .eq('activo', true);
 
+    if (search) {
+      // Búsqueda en nombre y descripción (puedes agregar más campos si quieres)
+      query = query.or(`nombre.ilike.%${search}%,descripcion.ilike.%${search}%`);
+    }
+
+    const { data, error, count } = await query
+      .order('nombre')
+      .range(from, to);
+
+    if (error) throw error;
+
+    res.setHeader('X-Total-Count', count);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Las demás funciones (getById, create, update, delete, getRepuestosBajoStock) permanecen igual
+// ...
 export const getRepuestoById = async (req, res) => {
   try {
     const supabase = getSupabaseWithToken(req.token)
