@@ -76,7 +76,7 @@ export const createRepuesto = async (req, res) => {
         categoria_id,
         proveedor_id,
         stock: stock || 0,
-        stock_minimo: stock_minimo || 5,
+        stock_minimo:  0,
         precio_compra,
         precio_venta,
         ubicacion,
@@ -149,12 +149,12 @@ export const reactivarRepuesto = async (req, res) => {
 // Función RPC para stock bajo (solo repuestos activos)
 export const getRepuestosBajoStock = async (req, res) => {
   try {
-    const supabase = getSupabaseWithToken(req.token)
-    const { data, error } = await supabase
-      .rpc('get_repuestos_bajo_stock')
-    if (error) throw error
-    res.json(data)
+    const supabase = getSupabaseWithToken(req.token);
+    const { data, error } = await supabase.rpc('get_repuestos_bajo_stock');
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en getRepuestosBajoStock:', error);
+    res.status(500).json({ error: error.message });
   }
-}
+};
