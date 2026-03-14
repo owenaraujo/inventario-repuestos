@@ -76,7 +76,8 @@ export const createRepuesto = async (req, res) => {
         categoria_id,
         proveedor_id,
         stock: stock || 0,
-        stock_minimo:  0,
+        stock_minimo:  stock_minimo||0,
+        
         precio_compra,
         precio_venta,
         ubicacion,
