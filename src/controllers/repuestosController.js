@@ -77,7 +77,7 @@ export const createRepuesto = async (req, res) => {
         proveedor_id,
         stock: stock || 0,
         stock_minimo:  stock_minimo||0,
-        
+
         precio_compra,
         precio_venta,
         ubicacion,
@@ -156,6 +156,29 @@ export const getRepuestosBajoStock = async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error('Error en getRepuestosBajoStock:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const countRepuestos = async (req, res) => {
+  
+  
+  try {
+    c
+    
+    const supabase = getSupabaseWithToken(req.token);
+    const { count, error } = await supabase
+      .from('repuestos')
+      .select('*', { count: 'exact', head: true })
+      .eq('activo', true);
+    if (error) throw error;
+    
+    
+    res.json({ count });
+  } catch (error) {
+  
+    
     res.status(500).json({ error: error.message });
   }
 };
