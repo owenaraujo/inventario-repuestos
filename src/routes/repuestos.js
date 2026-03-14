@@ -16,8 +16,8 @@ router.use(authMiddleware)
 
 router.get('/', getRepuestos)
 router.get('/count', countRepuestos);
-router.get('/bajo-stock', getRepuestosBajoStock)
-router.get('/:id', getRepuestoById)
+router.get('/consulta/bajo-stock', getRepuestosBajoStock)
+router.get('/consulta/:id', getRepuestoById)
 router.post('/', createRepuesto)
 router.put('/:id', updateRepuesto)
 router.delete('/:id', deleteRepuesto)
