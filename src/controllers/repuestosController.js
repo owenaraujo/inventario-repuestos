@@ -165,7 +165,7 @@ export const countRepuestos = async (req, res) => {
   
   
   try {
-    c
+    
     
     const supabase = getSupabaseWithToken(req.token);
     const { count, error } = await supabase
